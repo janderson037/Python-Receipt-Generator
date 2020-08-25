@@ -1,0 +1,108 @@
+echo "# Python-Receipt-Generator" >> README.md
+git init
+git add README.md
+git commit -m "first commit"
+git remote add origin https://github.com/janderson037/Python-Receipt-Generator.git
+git push -u origin master
+
+#ask a user to input an item to buy
+#ask user to input the cost of the item
+#ask the user to input the quantity of what they are buying
+#ask the user if they want to keep shopping
+#calculate the sub total of everything (with discounts)
+#calculate the final total of everything (with taxes)
+
+#given
+# empty list with dictionary for discount items and amounts
+items = []
+discounts = {"lipstick": .05, "eye": .03, "annual sale": .20, "skincare": .05}
+
+#define main function
+def main():
+    #ask the user for their input 
+    item = input("What item would you like to buy today?: ")
+    cost = float(input("How much does that item cost?: "))
+    amount = int(input("How much of that item are you buying?: "))
+    # add the items to the list, this becomes 2d list
+    items.append([item, cost, amount])
+    # keep asking unless user enters other than yes
+    choice = input("Would you like to buy another item? (y/n): ")
+
+    #create a while to loop to keep asking for user input if they put y
+    while choice == "y":
+        #ask the user for their input 
+        item = input("What item would you like to buy today?: ")
+        cost = float(input("How much does that item cost?: "))
+        amount = int(input("How much of that item are you buying?: "))
+        # add the items to the list, this becomes 2d list
+        items.append([item, cost, amount])
+        # keep asking unless user enters other than yes
+        choice = input("Would you like to buy another item? (y/n): ")
+        #break while loop if user enters n
+        if choice == "n":
+            break
+    print_receipt(items)
+
+#define function to calculate total with tax
+def calculate_tax(x):
+    return (1 + 0.15)*x
+
+
+#define function to calculate the discounts of items
+def calculate_discount(items):
+    # iterate each item
+    for item in items:
+        item[1] = (1 - if_discount(item[0]))*item[1]
+
+#define function to calculate the the total of items
+def calculate_total(items):
+    calculate_discount(items)
+    # define total
+    total = 0
+    # iterate each item
+    for item in items:
+        # new total = total of all items
+        total += float(item[1]*float(item[2]))
+    # return so can find in respects to tax
+    return total
+
+#define function to check if any items qualify for a discount
+def if_discount(x):
+    discount = 0
+    for key in discounts:
+        if key in x:
+            discount = discounts[key]
+        if discount!=0:
+            break
+    return discount
+        
+#define function to print receipt of items and their totals
+def print_receipt(items):
+    #make variable for subtotal
+    subtotal = round(calculate_total(items), 2)
+    #make variable for complete total
+    after_tax = round(calculate_tax(subtotal), 2)
+    #print items, their quantities, and subtotals
+    for item in items:
+        amount = item[1]*item[2]
+        print(item[0], "\t\t\t", item[2], ": ", f"{amount:.2f}")
+    #print separator
+    print("--------------------------------------------------")
+    #print subtotal and complete total
+    print(f"Your subtotal is: {subtotal:.2f}")
+    print(f"Your total after tax is: {after_tax:.2f}")
+
+    #write all of this into a file
+    with open("receipt.txt", "w") as file:
+        for item in items:
+            file.write(item[0])
+            file.write("\t\t\t")
+            file.write(str(item[2]))
+            file.write(": ")
+            file.write(f"{item[1]*item[2]:.2f}\n")
+        file.write("--------------------------------------------------\n")
+        file.write(f"Your subtotal is: {subtotal:.2f}\n")
+        file.write(f"Your total after tax is: {after_tax:.2f}\n")
+
+#call on main function
+main()
